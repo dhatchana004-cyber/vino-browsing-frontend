@@ -10,10 +10,11 @@ import {
   HiOutlineUsers,
   HiOutlineCog,
   HiOutlineUserGroup,
-  HiOutlineX,
+  HiOutlineChevronLeft,
   HiOutlineLogout,
   HiOutlineGlobe,
 } from 'react-icons/hi';
+import { confirmAction } from '../../utils/confirmToast';
 
 const ownerNav = [
   { to: '/dashboard', label: 'Dashboard', icon: HiOutlineHome },
@@ -41,6 +42,13 @@ export default function Sidebar({ isOpen, onClose }) {
   const location = useLocation();
   const navItems = isOwner ? ownerNav : staffNav;
 
+  const handleNavClick = () => {
+    // Only auto-close the sidebar on mobile screens (less than 1024px)
+    if (window.innerWidth < 1024) {
+      onClose();
+    }
+  };
+
   return (
     <>
       {/* Mobile overlay */}
@@ -54,58 +62,65 @@ export default function Sidebar({ isOpen, onClose }) {
       {/* Sidebar */}
       <aside
         className={`
-          fixed top-0 left-0 z-50 h-full w-64 bg-white border-r border-slate-100 shadow-sm
-          transform transition-transform duration-300 ease-in-out
-          lg:translate-x-0 lg:static lg:z-0
-          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+          fixed top-0 left-0 z-50 h-full bg-white border-r border-slate-100 shadow-sm
+          transition-all duration-300 ease-in-out overflow-hidden
+          lg:static lg:z-0 flex-shrink-0
+          ${isOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64 lg:translate-x-0 lg:w-20'}
         `}
       >
-        {/* Logo */}
-        <div className="flex items-center justify-between h-20 px-6 border-b border-slate-50">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-600 to-accent-pink flex items-center justify-center font-bold text-white text-lg shadow-md shadow-brand-500/20">
-              V
+        <div className="w-full h-full flex flex-col">
+          {/* Logo */}
+          <div className={`flex items-center h-20 border-b border-slate-50 transition-all duration-300 ${isOpen ? 'justify-between px-6' : 'lg:justify-center px-6 justify-between'}`}>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-600 to-accent-pink flex-shrink-0 flex items-center justify-center font-bold text-white text-lg shadow-md shadow-brand-500/20">
+                V
+              </div>
+              <div className={`transition-opacity duration-200 ${!isOpen ? 'lg:hidden' : ''}`}>
+                <h1 className="text-lg font-bold text-slate-800 tracking-tight leading-tight whitespace-nowrap">VINO</h1>
+                <p className="text-[11px] font-medium text-slate-400 tracking-wider uppercase whitespace-nowrap">Browsing Center</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-lg font-bold text-slate-800 tracking-tight leading-tight">VINO</h1>
-              <p className="text-[11px] font-medium text-slate-400 tracking-wider uppercase">Browsing Center</p>
-            </div>
-          </div>
-          <button onClick={onClose} className="btn-icon lg:hidden">
-            <HiOutlineX className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Navigation */}
-        <div className="flex flex-col flex-1 h-[calc(100%-5rem)]">
-          <nav className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                onClick={onClose}
-                className={({ isActive }) =>
-                  `sidebar-link ${isActive ? 'active' : ''}`
-                }
-              >
-                <item.icon className="w-5 h-5 flex-shrink-0" strokeWidth={1.5} />
-                <div className="text-sm">{item.label}</div>
-              </NavLink>
-            ))}
-          </nav>
-          
-          <div className="p-4 border-t border-slate-100">
-            <button
-              onClick={async () => {
-                if (window.confirm('Are you sure you want to logout?')) {
-                  await logout();
-                }
-              }}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-danger-bg text-danger-text hover:bg-red-100 transition-colors text-sm font-bold"
-            >
-              <HiOutlineLogout className="w-5 h-5" strokeWidth={2} />
-              Logout
+            <button onClick={onClose} className={`btn-icon ${!isOpen ? 'lg:hidden' : ''}`}>
+              <HiOutlineChevronLeft className="w-6 h-6" />
             </button>
+          </div>
+
+          {/* Navigation */}
+          <div className="flex flex-col flex-1 h-[calc(100%-5rem)] overflow-hidden">
+            <nav className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto overflow-x-hidden">
+              {navItems.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  onClick={handleNavClick}
+                  className={({ isActive }) =>
+                    `sidebar-link ${isActive ? 'active' : ''} ${!isOpen ? 'lg:justify-center lg:px-0' : ''}`
+                  }
+                  title={!isOpen ? item.label : undefined}
+                >
+                  <item.icon className="w-5 h-5 flex-shrink-0" strokeWidth={1.5} />
+                  <div className={`text-sm whitespace-nowrap transition-all duration-200 ${!isOpen ? 'lg:hidden' : ''}`}>
+                    {item.label}
+                  </div>
+                </NavLink>
+              ))}
+            </nav>
+            
+            <div className="p-4 border-t border-slate-100">
+              <button
+                onClick={() => {
+                  handleNavClick();
+                  confirmAction('Are you sure you want to logout?', async () => {
+                    await logout();
+                  });
+                }}
+                className={`w-full flex items-center gap-3 py-2.5 rounded-xl bg-danger-bg text-danger-text hover:bg-red-100 transition-colors text-sm font-bold ${isOpen ? 'justify-start px-4' : 'lg:justify-center lg:px-0 justify-start px-4'}`}
+                title={!isOpen ? 'Logout' : undefined}
+              >
+                <HiOutlineLogout className="w-5 h-5 flex-shrink-0" strokeWidth={2} />
+                <span className={`whitespace-nowrap transition-all duration-200 ${!isOpen ? 'lg:hidden' : ''}`}>Logout</span>
+              </button>
+            </div>
           </div>
         </div>
       </aside>

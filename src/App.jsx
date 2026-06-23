@@ -85,7 +85,7 @@ export default function App() {
         <AuthProvider>
           <AppRoutes />
           <Toaster
-            position="top-right"
+            position="top-center"
             toastOptions={{
               duration: 3000,
               style: {

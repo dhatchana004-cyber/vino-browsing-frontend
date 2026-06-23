@@ -865,7 +865,6 @@ export default function Login() {
           background: white;
           border-color: var(--ring-color, #3b82f6);
           box-shadow: 0 0 0 4px color-mix(in srgb, var(--ring-color, #3b82f6) 12%, transparent);
-          transform: scale(1.01);
         }
         .login-input-icon {
           flex-shrink: 0;
@@ -882,6 +881,17 @@ export default function Login() {
           color: #1e293b;
           outline: none;
           font-family: inherit;
+        }
+        .login-input:focus, .login-input:focus-visible {
+          outline: none !important;
+          box-shadow: none !important;
+        }
+        .login-input:-webkit-autofill,
+        .login-input:-webkit-autofill:hover,
+        .login-input:-webkit-autofill:focus,
+        .login-input:-webkit-autofill:active {
+          transition: background-color 5000s ease-in-out 0s;
+          -webkit-text-fill-color: #1e293b !important;
         }
         .login-input::placeholder { color: #94a3b8; }
         .login-eye {

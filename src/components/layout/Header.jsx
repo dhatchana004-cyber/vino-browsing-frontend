@@ -8,6 +8,7 @@ import {
 } from 'react-icons/hi';
 import { useTodayAttendance } from '../../hooks/useApi';
 import ProfileModal from '../ui/ProfileModal';
+import { confirmAction } from '../../utils/confirmToast';
 
 export default function Header({ onMenuClick }) {
   const { user, logout } = useAuth();
@@ -78,10 +79,10 @@ export default function Header({ onMenuClick }) {
     return `${h}:${m}:${s}`;
   };
 
-  const handleLogout = async () => {
-    if (window.confirm('Are you sure you want to logout?')) {
+  const handleLogout = () => {
+    confirmAction('Are you sure you want to logout?', async () => {
       await logout();
-    }
+    });
   };
 
   return (
@@ -90,7 +91,7 @@ export default function Header({ onMenuClick }) {
       <div className="flex items-center gap-4 w-1/3">
         <button
           onClick={onMenuClick}
-          className="btn-icon lg:hidden"
+          className="btn-icon"
           id="sidebar-toggle"
         >
           <HiOutlineMenu className="w-5 h-5" />

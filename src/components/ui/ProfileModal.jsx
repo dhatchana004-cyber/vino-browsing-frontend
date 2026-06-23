@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useUpdateProfile, useDeleteProfilePhoto } from '../../hooks/useApi';
 import { HiOutlineX, HiOutlineCamera, HiOutlineUser, HiOutlineTrash } from 'react-icons/hi';
 import toast from 'react-hot-toast';
+import { confirmAction } from '../../utils/confirmToast';
 
 export default function ProfileModal({ onClose }) {
   const { user, updateUser } = useAuth();
@@ -51,17 +52,17 @@ export default function ProfileModal({ onClose }) {
   };
 
   const handleDeletePhoto = async () => {
-    if (!window.confirm('Are you sure you want to delete your profile photo?')) return;
-    
-    try {
-      const updatedUser = await deleteProfilePhoto.mutateAsync();
-      updateUser(updatedUser);
-      setPreview(null);
-      setSelectedFile(null);
-      toast.success('Profile photo deleted');
-    } catch (err) {
-      toast.error('Failed to delete profile photo');
-    }
+    confirmAction('Are you sure you want to delete your profile photo?', async () => {
+      try {
+        const updatedUser = await deleteProfilePhoto.mutateAsync();
+        updateUser(updatedUser);
+        setPreview(null);
+        setSelectedFile(null);
+        toast.success('Profile photo deleted');
+      } catch (err) {
+        toast.error('Failed to delete profile photo');
+      }
+    });
   };
 
   return createPortal(

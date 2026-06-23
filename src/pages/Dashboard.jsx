@@ -6,6 +6,7 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { getLocalDateString } from '../utils/date';
 import toast from 'react-hot-toast';
 import { HiOutlineCurrencyRupee, HiOutlineTrendingUp, HiOutlineUserGroup, HiOutlinePlus, HiOutlineSave, HiOutlineDocumentSearch } from 'react-icons/hi';
+import { confirmAction } from '../utils/confirmToast';
 
 export default function Dashboard() {
   const { data, isLoading, error } = useDashboard();
@@ -44,14 +45,14 @@ export default function Dashboard() {
   };
 
   const handleDeleteExpense = async (id) => {
-    if (window.confirm('Delete this expense?')) {
+    confirmAction('Delete this expense?', async () => {
       try {
         await deleteExpense.mutateAsync(id);
         toast.success('Expense deleted');
       } catch {
         toast.error('Failed to delete expense');
       }
-    }
+    });
   };
 
   const handleSaveBalance = async () => {

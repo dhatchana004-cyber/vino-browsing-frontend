@@ -4,6 +4,7 @@ import api from '../api/axios';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { HiOutlinePlus, HiOutlineCheck, HiOutlineX } from 'react-icons/hi';
+import { confirmAction } from '../utils/confirmToast';
 
 export default function ServiceSettings() {
   const { data: servicesData, isLoading, refetch } = useServices();
@@ -24,14 +25,15 @@ export default function ServiceSettings() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to completely delete this service?')) return;
-    try {
-      await api.delete(`/services/${id}/`);
-      toast.success('Service deleted');
-      refetch();
-    } catch {
-      toast.error('Failed to delete service. It might be used in existing entries.');
-    }
+    confirmAction('Are you sure you want to completely delete this service?', async () => {
+      try {
+        await api.delete(`/services/${id}/`);
+        toast.success('Service deleted');
+        refetch();
+      } catch {
+        toast.error('Failed to delete service. It might be used in existing entries.');
+      }
+    });
   };
 
   return (

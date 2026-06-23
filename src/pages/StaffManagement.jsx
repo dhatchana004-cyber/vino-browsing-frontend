@@ -4,6 +4,7 @@ import api from '../api/axios';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { HiOutlineUserAdd, HiOutlineTrash, HiOutlineCheck, HiOutlineX, HiOutlinePencil, HiOutlineLogout } from 'react-icons/hi';
+import { confirmAction } from '../utils/confirmToast';
 
 export default function StaffManagement() {
   const { data: staff, isLoading, refetch } = useStaffList();
@@ -58,25 +59,27 @@ export default function StaffManagement() {
   };
 
   const deleteStaff = async (id) => {
-    if (!window.confirm('Delete this staff member completely?')) return;
-    try {
-      await api.delete(`/staff/${id}/`);
-      toast.success('Staff deleted');
-      refetch();
-    } catch {
-      toast.error('Failed to delete');
-    }
+    confirmAction('Delete this staff member completely?', async () => {
+      try {
+        await api.delete(`/staff/${id}/`);
+        toast.success('Staff deleted');
+        refetch();
+      } catch {
+        toast.error('Failed to delete');
+      }
+    });
   };
 
   const forceLogout = async (id) => {
-    if (!window.confirm('Force logout this staff member?')) return;
-    try {
-      await api.post(`/staff/${id}/logout/`);
-      toast.success('Staff logged out successfully');
-      refetch();
-    } catch {
-      toast.error('Failed to logout staff');
-    }
+    confirmAction('Force logout this staff member?', async () => {
+      try {
+        await api.post(`/staff/${id}/logout/`);
+        toast.success('Staff logged out successfully');
+        refetch();
+      } catch {
+        toast.error('Failed to logout staff');
+      }
+    });
   };
 
   return (

@@ -15,6 +15,7 @@ import {
   HiOutlineStar, HiOutlineViewGrid, HiOutlineBriefcase, HiOutlinePhone,
   HiOutlinePhotograph, HiOutlineSave,
 } from 'react-icons/hi';
+import { confirmAction } from '../utils/confirmToast';
 
 // ============ Accordion Section ============
 function AccordionSection({ icon: Icon, title, emoji, children, isOpen, onToggle }) {
@@ -370,8 +371,9 @@ function ServicesSection({ isOpen, onToggle }) {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Delete this service?')) return;
-    try { await deleteService.mutateAsync(id); toast.success('Deleted'); } catch { toast.error('Failed'); }
+    confirmAction('Delete this service?', async () => {
+      try { await deleteService.mutateAsync(id); toast.success('Deleted'); } catch { toast.error('Failed'); }
+    });
   };
 
   return (
@@ -515,8 +517,9 @@ function JobUpdatesSection({ isOpen, onToggle }) {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Delete this job?')) return;
-    try { await deleteJob.mutateAsync(id); toast.success('Deleted'); } catch { toast.error('Failed'); }
+    confirmAction('Delete this job?', async () => {
+      try { await deleteJob.mutateAsync(id); toast.success('Deleted'); } catch { toast.error('Failed'); }
+    });
   };
 
   const renderForm = (isEditing) => (
@@ -702,8 +705,9 @@ function EducationApplicationsSection({ isOpen, onToggle }) {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Delete this application?')) return;
-    try { await deleteApp.mutateAsync(id); toast.success('Deleted'); } catch { toast.error('Failed'); }
+    confirmAction('Delete this application?', async () => {
+      try { await deleteApp.mutateAsync(id); toast.success('Deleted'); } catch { toast.error('Failed'); }
+    });
   };
 
   const renderForm = (isEditing) => (
