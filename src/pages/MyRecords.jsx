@@ -121,8 +121,7 @@ export default function MyRecords() {
                     <td><StatusBadge status={entry.status} /></td>
                     <td>
                       <select
-                        disabled={!canEdit(entry)}
-                        className={`bg-slate-50 border border-slate-200 text-xs rounded-lg px-2 py-1.5 text-slate-700 font-semibold focus:ring-2 focus:ring-brand-500/20 ${!canEdit(entry) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                        className="bg-slate-50 border border-slate-200 text-xs rounded-lg px-2 py-1.5 text-slate-700 font-semibold focus:ring-2 focus:ring-brand-500/20 cursor-pointer"
                         value={entry.status}
                         onChange={(e) => {
                           updateStatus.mutate({ id: entry.id, status: e.target.value }, {

@@ -12,7 +12,7 @@ const api = axios.create({
 // Attach JWT token to every request
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('access_token');
+    const token = sessionStorage.getItem('access_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -57,7 +57,7 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const refreshToken = localStorage.getItem('refresh_token');
+        const refreshToken = sessionStorage.getItem('refresh_token');
         if (!refreshToken) {
           throw new Error('No refresh token');
         }
@@ -66,9 +66,9 @@ api.interceptors.response.use(
           refresh: refreshToken,
         });
 
-        localStorage.setItem('access_token', data.access);
+        sessionStorage.setItem('access_token', data.access);
         if (data.refresh) {
-          localStorage.setItem('refresh_token', data.refresh);
+          sessionStorage.setItem('refresh_token', data.refresh);
         }
 
         api.defaults.headers.common['Authorization'] = 'Bearer ' + data.access;
@@ -79,9 +79,9 @@ api.interceptors.response.use(
       } catch (refreshError) {
         processQueue(refreshError, null);
         // Refresh failed — force logout
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        localStorage.removeItem('user');
+        sessionStorage.removeItem('access_token');
+        sessionStorage.removeItem('refresh_token');
+        sessionStorage.removeItem('user');
         window.location.href = '/login';
         return Promise.reject(refreshError);
       } finally {

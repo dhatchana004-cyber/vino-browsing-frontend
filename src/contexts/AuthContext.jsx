@@ -5,24 +5,24 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    const stored = localStorage.getItem('user');
+    const stored = sessionStorage.getItem('user');
     return stored ? JSON.parse(stored) : null;
   });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Verify token on mount
-    const token = localStorage.getItem('access_token');
+    const token = sessionStorage.getItem('access_token');
     if (token) {
       api.get('/auth/me/')
         .then(({ data }) => {
           setUser(data);
-          localStorage.setItem('user', JSON.stringify(data));
+          sessionStorage.setItem('user', JSON.stringify(data));
         })
         .catch(() => {
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('refresh_token');
-          localStorage.removeItem('user');
+          sessionStorage.removeItem('access_token');
+          sessionStorage.removeItem('refresh_token');
+          sessionStorage.removeItem('user');
           setUser(null);
         })
         .finally(() => setLoading(false));
@@ -36,36 +36,36 @@ export function AuthProvider({ children }) {
     if (data.status === 'pending') {
       return data;
     }
-    localStorage.setItem('access_token', data.access);
-    localStorage.setItem('refresh_token', data.refresh);
-    localStorage.setItem('user', JSON.stringify(data.user));
+    sessionStorage.setItem('access_token', data.access);
+    sessionStorage.setItem('refresh_token', data.refresh);
+    sessionStorage.setItem('user', JSON.stringify(data.user));
     setUser(data.user);
     return data.user;
   }, []);
 
   const loginWithToken = useCallback((data) => {
-    localStorage.setItem('access_token', data.access);
-    localStorage.setItem('refresh_token', data.refresh);
-    localStorage.setItem('user', JSON.stringify(data.user));
+    sessionStorage.setItem('access_token', data.access);
+    sessionStorage.setItem('refresh_token', data.refresh);
+    sessionStorage.setItem('user', JSON.stringify(data.user));
     setUser(data.user);
     return data.user;
   }, []);
 
   const updateUser = useCallback((updatedUser) => {
-    localStorage.setItem('user', JSON.stringify(updatedUser));
+    sessionStorage.setItem('user', JSON.stringify(updatedUser));
     setUser(updatedUser);
   }, []);
 
   const logout = useCallback(async () => {
     try {
-      const refreshToken = localStorage.getItem('refresh_token');
+      const refreshToken = sessionStorage.getItem('refresh_token');
       await api.post('/auth/logout/', { refresh: refreshToken });
     } catch (e) {
       // Ignore logout errors
     }
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    localStorage.removeItem('user');
+    sessionStorage.removeItem('access_token');
+    sessionStorage.removeItem('refresh_token');
+    sessionStorage.removeItem('user');
     setUser(null);
   }, []);
 
