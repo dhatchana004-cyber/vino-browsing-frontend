@@ -26,11 +26,12 @@ export default function MyRecords() {
   const canEdit = (entry) => {
     if (isOwner) return true;
     const serviceName = (entry.service_name || '').toLowerCase();
-    const isRestricted = serviceName.includes('pan new') || serviceName.includes('pan correction') || serviceName.includes('pan ');
-    if (isRestricted) {
-      return user?.permissions?.includes('edit_records');
+    const isPanService = serviceName.includes('pan new') || serviceName.includes('pan correction') || serviceName.includes('pan ') || serviceName === 'pan';
+    
+    if (user?.permissions?.includes('edit_records')) {
+      return isPanService;
     }
-    return true;
+    return false;
   };
 
   const handleClearFilters = () => {
@@ -120,7 +121,8 @@ export default function MyRecords() {
                     <td><StatusBadge status={entry.status} /></td>
                     <td>
                       <select
-                        className="bg-slate-50 border border-slate-200 text-xs rounded-lg px-2 py-1.5 text-slate-700 font-semibold focus:ring-2 focus:ring-brand-500/20 cursor-pointer"
+                        disabled={!canEdit(entry)}
+                        className={`bg-slate-50 border border-slate-200 text-xs rounded-lg px-2 py-1.5 text-slate-700 font-semibold focus:ring-2 focus:ring-brand-500/20 ${!canEdit(entry) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                         value={entry.status}
                         onChange={(e) => {
                           updateStatus.mutate({ id: entry.id, status: e.target.value }, {

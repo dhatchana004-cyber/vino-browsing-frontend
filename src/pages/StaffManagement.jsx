@@ -99,7 +99,11 @@ export default function StaffManagement() {
           {staff?.map(s => (
             <div key={s.id} className="card relative group">
               <div className="absolute top-4 right-4 flex gap-2">
-                <button onClick={() => forceLogout(s.id)} className="btn-icon text-slate-400 hover:text-orange-600 hover:bg-orange-50" title="Force Logout">
+                <button 
+                  onClick={() => s.is_online && forceLogout(s.id)} 
+                  className={`btn-icon ${s.is_online ? 'text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700' : 'text-rose-500 hover:bg-rose-50 hover:text-rose-600'}`} 
+                  title={s.is_online ? "Force Logout (Online)" : "Offline (Cannot Logout)"}
+                >
                   <HiOutlineLogout className="w-5 h-5" />
                 </button>
                 <button

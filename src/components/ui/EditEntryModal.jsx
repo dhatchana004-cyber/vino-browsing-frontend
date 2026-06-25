@@ -3,6 +3,7 @@ import { useServices, useUpdateEntry, useStaffList } from '../../hooks/useApi';
 import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
 import { HiOutlineX, HiOutlineCurrencyRupee, HiOutlineUser, HiOutlinePhone, HiOutlineHashtag } from 'react-icons/hi';
+import { STATUS_LABELS } from './StatusBadge';
 
 export default function EditEntryModal({ entry, onClose }) {
   const { user, isOwner } = useAuth();
@@ -17,6 +18,10 @@ export default function EditEntryModal({ entry, onClose }) {
     phone: '',
     service: '',
     staff: '',
+    srn_number: '',
+    amount: '',
+    charge: '',
+    status: '',
   });
 
   useEffect(() => {
@@ -27,6 +32,9 @@ export default function EditEntryModal({ entry, onClose }) {
         service: entry.service || '',
         staff: entry.staff || '',
         srn_number: entry.srn_number || '',
+        amount: entry.amount || '',
+        charge: entry.charge || '',
+        status: entry.status || '',
       });
     }
   }, [entry]);
@@ -36,10 +44,13 @@ export default function EditEntryModal({ entry, onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Only include staff field if the current user is an owner, to prevent unauthorized staff re-assignment
+      // Only include staff and sensitive fields if the current user is an owner, to prevent unauthorized edits
       const dataToSubmit = { ...form };
       if (!isOwner) {
         delete dataToSubmit.staff;
+        delete dataToSubmit.amount;
+        delete dataToSubmit.charge;
+        delete dataToSubmit.status;
       }
       
       await updateEntry.mutateAsync({ id: entry.id, data: dataToSubmit });
@@ -151,6 +162,52 @@ export default function EditEntryModal({ entry, onClose }) {
                 </div>
               </div>
             </div>
+
+            {isOwner && (
+              <div className="space-y-4 pt-4 border-t border-slate-100">
+                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-2">Owner Controls</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <label className="input-label">Amount (₹)</label>
+                    <div className="relative">
+                      <HiOutlineCurrencyRupee className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input 
+                        type="number" 
+                        step="0.01"
+                        className="input pl-10" 
+                        value={form.amount}
+                        onChange={e => setForm(p => ({ ...p, amount: e.target.value }))}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="input-label">Charge (₹)</label>
+                    <div className="relative">
+                      <HiOutlineCurrencyRupee className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input 
+                        type="number" 
+                        step="0.01"
+                        className="input pl-10" 
+                        value={form.charge}
+                        onChange={e => setForm(p => ({ ...p, charge: e.target.value }))}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="input-label">Status</label>
+                    <select 
+                      className="select" 
+                      value={form.status}
+                      onChange={e => setForm(p => ({ ...p, status: e.target.value }))}
+                    >
+                      {Object.entries(STATUS_LABELS).map(([k, v]) => (
+                        <option key={k} value={k}>{v}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )}
           </form>
         </div>
 

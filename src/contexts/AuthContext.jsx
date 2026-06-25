@@ -31,8 +31,8 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  const login = useCallback(async (username, password) => {
-    const { data } = await api.post('/auth/login/', { username, password });
+  const login = useCallback(async (username, password, role) => {
+    const { data } = await api.post('/auth/login/', { username, password, role });
     if (data.status === 'pending') {
       return data;
     }

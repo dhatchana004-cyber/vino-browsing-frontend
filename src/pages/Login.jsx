@@ -161,7 +161,7 @@ export default function Login() {
     await new Promise(resolve => setTimeout(resolve, 800));
 
     try {
-      const res = await login(username, password);
+      const res = await login(username, password, loginType);
       if (res?.status === 'pending') { 
         setPendingRequestId(res.request_id); 
         setTimeLeft(120); 

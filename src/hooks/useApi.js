@@ -471,7 +471,14 @@ export function useEducationApps() {
 export function useCreateEducationApp() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (data) => api.post('/public-site/education/', data).then(r => r.data),
+    mutationFn: (data) => {
+      if (data instanceof FormData) {
+        return api.post('/public-site/education/', data, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        }).then(r => r.data);
+      }
+      return api.post('/public-site/education/', data).then(r => r.data);
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['education-apps'] }),
   });
 }
@@ -479,7 +486,14 @@ export function useCreateEducationApp() {
 export function useUpdateEducationApp() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, ...data }) => api.put(`/public-site/education/${id}/`, data).then(r => r.data),
+    mutationFn: ({ id, data }) => {
+      if (data instanceof FormData) {
+        return api.put(`/public-site/education/${id}/`, data, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        }).then(r => r.data);
+      }
+      return api.put(`/public-site/education/${id}/`, data).then(r => r.data);
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['education-apps'] }),
   });
 }

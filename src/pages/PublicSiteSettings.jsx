@@ -671,12 +671,22 @@ function EducationApplicationsSection({ isOpen, onToggle }) {
   const deleteApp = useDeleteEducationApp();
   const [showAddForm, setShowAddForm] = useState(false);
   const [editId, setEditId] = useState(null);
-  const [form, setForm] = useState({ exam_name: '', exam_date: '', last_date: '', is_active: true });
+  
+  const initialForm = { 
+    title: '', exam_name: '', post_count: '', qualification: '', 
+    description: '', exam_date: '', last_date: '', is_active: true 
+  };
+  const [form, setForm] = useState(initialForm);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const imageInputRef = useRef(null);
 
   const resetForm = () => { 
-    setForm({ exam_name: '', exam_date: '', last_date: '', is_active: true }); 
+    setForm(initialForm); 
     setEditId(null); 
     setShowAddForm(false); 
+    setImageFile(null);
+    setImagePreview(null);
   };
 
   const handleEdit = (app) => {
@@ -684,20 +694,45 @@ function EducationApplicationsSection({ isOpen, onToggle }) {
       resetForm();
       return;
     }
-    setForm({ exam_name: app.exam_name, exam_date: app.exam_date || '', last_date: app.last_date || '', is_active: app.is_active });
+    setForm({ 
+      title: app.title || '', 
+      exam_name: app.exam_name || '', 
+      post_count: app.post_count || '', 
+      qualification: app.qualification || '', 
+      description: app.description || '', 
+      exam_date: app.exam_date || '', 
+      last_date: app.last_date || '', 
+      is_active: app.is_active 
+    });
     setEditId(app.id);
+    setImageFile(null);
+    setImagePreview(app.image || null);
     setShowAddForm(false);
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.exam_name.trim()) { toast.error('Exam Name is required'); return; }
+    
+    const formData = new FormData();
+    Object.entries(form).forEach(([k, v]) => {
+      if (v !== null && v !== undefined && v !== '') formData.append(k, v);
+    });
+    if (imageFile) formData.append('image', imageFile);
+
     try {
       if (editId) {
-        await updateApp.mutateAsync({ id: editId, ...form });
+        await updateApp.mutateAsync({ id: editId, data: formData });
         toast.success('Application updated');
       } else {
-        await createApp.mutateAsync(form);
+        await createApp.mutateAsync(formData);
         toast.success('Application added');
       }
       resetForm();
@@ -713,17 +748,70 @@ function EducationApplicationsSection({ isOpen, onToggle }) {
   const renderForm = (isEditing) => (
     <div className={`p-4 bg-slate-50 border border-slate-200 ${isEditing ? 'border-t-0 rounded-b-xl' : 'rounded-xl mt-3'} space-y-3`}>
       <h4 className="font-bold text-slate-700 text-sm">{isEditing ? 'Edit Application' : 'Add New Application'}</h4>
-      <form onSubmit={handleSubmit} className="space-y-3">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <input className="input" placeholder="Exam Name" value={form.exam_name} onChange={e => setForm(f => ({ ...f, exam_name: e.target.value }))} required />
-          <div className="flex items-center gap-2">
-            <input className="input w-full text-xs" type="date" value={form.exam_date} onChange={e => setForm(f => ({ ...f, exam_date: e.target.value }))} title="Exam Date (optional)" />
+      <form onSubmit={handleSubmit} className="space-y-4">
+        
+        {/* Main Fields */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="text-xs text-slate-500 font-medium mb-1 block">Title (Optional)</label>
+            <input className="input w-full" placeholder="e.g. TNPSC Group 4" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
           </div>
-          <div className="flex items-center gap-2">
-            <input className="input w-full text-xs" type="date" value={form.last_date} onChange={e => setForm(f => ({ ...f, last_date: e.target.value }))} title="Last Date (optional)" />
+          <div>
+            <label className="text-xs text-slate-500 font-medium mb-1 block">Exam Name</label>
+            <input className="input w-full" placeholder="e.g. Group 4" value={form.exam_name} onChange={e => setForm(f => ({ ...f, exam_name: e.target.value }))} required />
+          </div>
+          <div>
+            <label className="text-xs text-slate-500 font-medium mb-1 block">Post Count</label>
+            <input className="input w-full" placeholder="e.g. 1500+" value={form.post_count} onChange={e => setForm(f => ({ ...f, post_count: e.target.value }))} />
+          </div>
+          <div>
+            <label className="text-xs text-slate-500 font-medium mb-1 block">Qualification</label>
+            <input className="input w-full" placeholder="e.g. Any Degree" value={form.qualification} onChange={e => setForm(f => ({ ...f, qualification: e.target.value }))} />
           </div>
         </div>
-        <div className="flex items-center justify-between mt-2">
+
+        {/* Dates */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="text-xs text-slate-500 font-medium mb-1 block">Exam Date</label>
+            <input className="input w-full text-sm" type="date" value={form.exam_date} onChange={e => setForm(f => ({ ...f, exam_date: e.target.value }))} />
+          </div>
+          <div>
+            <label className="text-xs text-slate-500 font-medium mb-1 block">Last Date</label>
+            <input className="input w-full text-sm" type="date" value={form.last_date} onChange={e => setForm(f => ({ ...f, last_date: e.target.value }))} />
+          </div>
+        </div>
+
+        {/* Image & Description */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="col-span-1">
+            <label className="text-xs text-slate-500 font-medium mb-1 block">Image</label>
+            <div className="flex items-center gap-3">
+              <div 
+                onClick={() => imageInputRef.current?.click()}
+                className="w-20 h-20 rounded-lg bg-white border border-dashed border-slate-300 flex items-center justify-center cursor-pointer overflow-hidden hover:border-brand-400"
+              >
+                {imagePreview ? (
+                  <img src={imagePreview} className="w-full h-full object-cover" alt="Preview" />
+                ) : (
+                  <HiOutlinePhotograph className="w-6 h-6 text-slate-300" />
+                )}
+              </div>
+              <input type="file" ref={imageInputRef} className="hidden" accept="image/*" onChange={handleImageChange} />
+              {imagePreview && (
+                <button type="button" onClick={() => { setImageFile(null); setImagePreview(null); }} className="text-xs text-red-500 font-medium hover:underline">
+                  Remove
+                </button>
+              )}
+            </div>
+          </div>
+          <div className="col-span-2 flex flex-col">
+            <label className="text-xs text-slate-500 font-medium mb-1 block">Description</label>
+            <textarea className="input flex-1 min-h-[80px]" placeholder="Optional description..." value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between pt-2 border-t border-slate-200">
           <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-slate-700">
             <input type="checkbox" checked={form.is_active} onChange={e => setForm(f => ({ ...f, is_active: e.target.checked }))} className="w-4 h-4 text-brand-600 rounded" />
             Active
@@ -748,13 +836,22 @@ function EducationApplicationsSection({ isOpen, onToggle }) {
               {apps.map(app => (
                 <div key={app.id} className="flex flex-col shadow-sm">
                   <div className={`flex items-center justify-between p-4 border ${app.is_active ? 'bg-white border-slate-200' : 'bg-slate-50 border-slate-100 opacity-60'} ${editId === app.id ? 'rounded-t-xl border-b-0 bg-slate-50' : 'rounded-xl'}`}>
-                    <div>
-                      <div className="font-bold text-slate-800 text-sm">{app.exam_name}</div>
-                      <div className="text-xs text-slate-500 mt-0.5">
-                        {app.exam_date && <span className="font-medium text-indigo-600">Exam: {app.exam_date}</span>} 
-                        {app.last_date && <span className="font-medium text-pink-600 ml-2">Last Date: {app.last_date}</span>}
+                    <div className="flex items-start gap-4">
+                      {app.image && (
+                        <img src={app.image} alt={app.exam_name} className="w-16 h-16 object-cover rounded-lg border border-slate-200" />
+                      )}
+                      <div>
+                        <div className="font-bold text-slate-800 text-sm">{app.title || app.exam_name}</div>
+                        {app.title && app.exam_name && <div className="text-xs font-semibold text-slate-600">{app.exam_name}</div>}
+                        <div className="text-xs text-slate-500 mt-1 flex flex-wrap gap-x-3 gap-y-1">
+                          {app.qualification && <span><span className="font-semibold text-slate-600">Qual:</span> {app.qualification}</span>}
+                          {app.post_count && <span><span className="font-semibold text-slate-600">Posts:</span> {app.post_count}</span>}
+                          {app.last_date && <span><span className="font-semibold text-pink-600">Last Date:</span> {app.last_date}</span>}
+                          {app.exam_date && <span><span className="font-semibold text-indigo-600">Exam Date:</span> {app.exam_date}</span>}
+                        </div>
+                        {app.description && <div className="text-xs text-slate-500 mt-1">{app.description.substring(0, 80)}{app.description.length > 80 ? '...' : ''}</div>}
+                        {!app.is_active && <span className="text-[10px] font-bold text-red-500 uppercase mt-1 inline-block">Hidden</span>}
                       </div>
-                      {!app.is_active && <span className="text-[10px] font-bold text-red-500 uppercase mt-1 inline-block">Hidden</span>}
                     </div>
                     <div className="flex gap-1">
                       <button onClick={() => handleEdit(app)} className={`p-2 rounded-lg transition-colors ${editId === app.id ? 'bg-brand-100 text-brand-700' : 'text-slate-400 hover:text-brand-600 hover:bg-brand-50'}`}>
