@@ -4,6 +4,7 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';
 import StatusBadge from '../components/ui/StatusBadge';
 import { HiOutlineSearch, HiOutlineDocumentSearch, HiOutlineEye, HiOutlineX, HiOutlineDownload } from 'react-icons/hi';
 import DateFilter from '../components/ui/DateFilter';
+import { getRelativeMediaUrl } from '../utils/mediaUtils';
 
 function CustomerModal({ customerId, onClose }) {
   const { data: customer, isLoading } = useCustomerDetail(customerId);
@@ -61,7 +62,7 @@ function CustomerModal({ customerId, onClose }) {
                     {entry.document && (
                       <div className="flex items-center gap-2">
                         <button 
-                          onClick={() => setViewDoc(entry.document)}
+                          onClick={() => setViewDoc(getRelativeMediaUrl(entry.document))}
                           className="p-2 text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-lg transition-colors flex items-center gap-1.5 text-xs font-bold"
                           title="View Document"
                         >
@@ -69,7 +70,7 @@ function CustomerModal({ customerId, onClose }) {
                           View
                         </button>
                         <a 
-                          href={entry.document} 
+                          href={getRelativeMediaUrl(entry.document)} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           download

@@ -9,6 +9,7 @@ import { HiOutlineSearch, HiOutlineDownload, HiOutlineX, HiOutlinePencilAlt, HiO
 import DateFilter from '../components/ui/DateFilter';
 import EditEntryModal from '../components/ui/EditEntryModal';
 import { getLocalDateString } from '../utils/date';
+import { getRelativeMediaUrl } from '../utils/mediaUtils';
 
 export default function AllRecords() {
   const { user, isOwner } = useAuth();
@@ -180,10 +181,9 @@ export default function AllRecords() {
                       <td className="text-brand-600 font-mono text-xs">{entry.srn_number || '-'}</td>
                       <td>
                         {entry.document ? (
-                          <a href={entry.document} target="_blank" rel="noopener noreferrer" className="p-1.5 inline-flex text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-lg transition-colors" title="View Document">
+                          <a href={getRelativeMediaUrl(entry.document)} target="_blank" rel="noopener noreferrer" download className="p-1.5 inline-flex text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-lg transition-colors" title="Download Document">
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                             </svg>
                           </a>
                         ) : (

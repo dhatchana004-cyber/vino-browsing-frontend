@@ -7,11 +7,11 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'https://vino-browsing-backend.onrender.com',
+        target: 'https://api.vinobrowsing.com',
         changeOrigin: true,
       },
       '/media': {
-        target: 'https://vino-browsing-backend.onrender.com',
+        target: 'https://api.vinobrowsing.com',
         changeOrigin: true,
       },
     },

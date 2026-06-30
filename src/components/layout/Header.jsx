@@ -98,7 +98,9 @@ export default function Header({ onMenuClick }) {
         </button>
 
         <div className="hidden sm:block">
-          <p className="text-xs font-medium text-slate-400 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">vinobrowsing.com</p>
+          <a href="https://vinobrowsing.com" target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-slate-400 bg-slate-50 hover:bg-slate-100 hover:text-slate-600 transition-colors px-3 py-1.5 rounded-full border border-slate-100 inline-block">
+            vinobrowsing.com
+          </a>
         </div>
       </div>
 
