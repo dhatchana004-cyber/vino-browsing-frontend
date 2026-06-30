@@ -43,8 +43,12 @@ export default function StaffManagement() {
       }
       setShowModal(false);
       refetch();
-    } catch {
-      toast.error(editingStaff ? 'Failed to update staff' : 'Failed to create staff');
+    } catch (error) {
+      const errorMsg = error.response?.data?.username?.[0] || 
+                       error.response?.data?.password?.[0] || 
+                       error.response?.data?.detail || 
+                       (editingStaff ? 'Failed to update staff' : 'Failed to create staff');
+      toast.error(errorMsg);
     }
   };
 
