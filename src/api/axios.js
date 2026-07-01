@@ -6,10 +6,16 @@ const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
-    'Cache-Control': 'no-cache',
-    'Pragma': 'no-cache',
-    'Expires': '0',
   },
+});
+
+// Cache-busting interceptor for GET requests (Fix for Aapanel Nginx caching)
+api.interceptors.request.use((config) => {
+  if (config.method.toLowerCase() === 'get') {
+    config.params = config.params || {};
+    config.params._t = Date.now();
+  }
+  return config;
 });
 
 // Attach JWT token to every request

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useStaffList, useUpdateStaff } from '../hooks/useApi';
+import { useStaffList, useUpdateStaff, useForceLogoutStaff } from '../hooks/useApi';
 import api from '../api/axios';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
@@ -9,6 +9,7 @@ import { confirmAction } from '../utils/confirmToast';
 export default function StaffManagement() {
   const { data: staff, isLoading, refetch } = useStaffList();
   const updateStaff = useUpdateStaff();
+  const forceLogoutMutation = useForceLogoutStaff();
   const [showModal, setShowModal] = useState(false);
   const [editingStaff, setEditingStaff] = useState(null);
   const [form, setForm] = useState({ username: '', password: '', first_name: '' });
@@ -77,9 +78,8 @@ export default function StaffManagement() {
   const forceLogout = async (id) => {
     confirmAction('Force logout this staff member?', async () => {
       try {
-        await api.post(`/staff/${id}/logout/`);
+        await forceLogoutMutation.mutateAsync(id);
         toast.success('Staff logged out successfully');
-        refetch();
       } catch {
         toast.error('Failed to logout staff');
       }

@@ -5,7 +5,7 @@ import StatusBadge, { STATUS_LABELS } from '../components/ui/StatusBadge';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import toast from 'react-hot-toast';
 import api from '../api/axios';
-import { HiOutlineSearch, HiOutlineDownload, HiOutlineX, HiOutlinePencilAlt, HiOutlineLockClosed } from 'react-icons/hi';
+import { HiOutlineSearch, HiOutlineDownload, HiOutlineTrash, HiOutlinePencilAlt, HiOutlineLockClosed, HiOutlineX } from 'react-icons/hi';
 import DateFilter from '../components/ui/DateFilter';
 import EditEntryModal from '../components/ui/EditEntryModal';
 import { getLocalDateString } from '../utils/date';
@@ -14,6 +14,7 @@ import { getRelativeMediaUrl } from '../utils/mediaUtils';
 export default function AllRecords() {
   const { user, isOwner } = useAuth();
   const [editingEntry, setEditingEntry] = useState(null);
+  const [entryToDelete, setEntryToDelete] = useState(null);
   const [filters, setFilters] = useState({
     search: '',
     service: '',
@@ -24,7 +25,7 @@ export default function AllRecords() {
     page: 1,
   });
 
-  const { data, isLoading } = useEntries(
+  const { data, isLoading, refetch } = useEntries(
     Object.fromEntries(Object.entries(filters).filter(([_, v]) => v !== ''))
   );
   const { data: servicesData } = useServices();
@@ -160,6 +161,7 @@ export default function AllRecords() {
                   {isOwner && <th>Staff</th>}
                   <th>Update</th>
                   <th>Edit</th>
+                  {isOwner && <th>Delete</th>}
                 </tr>
               </thead>
               <tbody>
@@ -221,6 +223,17 @@ export default function AllRecords() {
                           </span>
                         )}
                       </td>
+                      {isOwner && (
+                        <td>
+                          <button
+                            onClick={() => setEntryToDelete(entry)}
+                            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Delete Record"
+                          >
+                            <HiOutlineTrash className="w-4 h-4" />
+                          </button>
+                        </td>
+                      )}
                     </tr>
                   ))
                 )}
@@ -258,6 +271,41 @@ export default function AllRecords() {
           entry={editingEntry}
           onClose={() => setEditingEntry(null)}
         />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {entryToDelete && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md flex flex-col animate-in zoom-in-95 duration-200 p-6 text-center">
+            <div className="w-16 h-16 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-4">
+              <HiOutlineX className="w-8 h-8" />
+            </div>
+            <h2 className="text-xl font-bold text-slate-800 mb-2">Delete Record?</h2>
+            <p className="text-slate-500 mb-6">Are you sure you want to completely delete the record for <b>{entryToDelete.customer_name || 'this customer'}</b>? This action cannot be undone.</p>
+            <div className="flex gap-3 justify-center">
+              <button 
+                onClick={() => setEntryToDelete(null)} 
+                className="btn-secondary px-6"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => {
+                  api.delete(`/entries/${entryToDelete.id}/`)
+                    .then(() => { 
+                      toast.success('Deleted'); 
+                      setEntryToDelete(null);
+                      refetch();
+                    })
+                    .catch(() => toast.error('Failed to delete'));
+                }}
+                className="btn-primary bg-red-600 hover:bg-red-700 shadow-red-500/20 px-8 border-transparent"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -69,8 +69,15 @@ export default function Dashboard() {
   };
 
 
-  const onlineStaff = data.staff_status?.filter(s => s.is_working) || [];
-  const offlineStaff = data.staff_status?.filter(s => !s.is_working) || [];
+  // Extra frontend safeguard to workaround the backend bug:
+  // Even if backend says is_working=true, check if login_time is actually from today.
+  const isToday = (dateString) => {
+    if (!dateString) return false;
+    return new Date(dateString).toISOString().split('T')[0] === new Date().toISOString().split('T')[0];
+  };
+
+  const onlineStaff = data.staff_status?.filter(s => s.is_working && isToday(s.login_time)) || [];
+  const offlineStaff = data.staff_status?.filter(s => !s.is_working || (s.is_working && !isToday(s.login_time))) || [];
 
   return (
     <div className="space-y-8 animate-in">

@@ -62,7 +62,29 @@ export function useDeleteProfilePhoto() {
 export function useServices() {
   return useQuery({
     queryKey: ['services'],
-    queryFn: () => api.get('/services/?page_size=100').then(r => r.data),
+    queryFn: async () => {
+      let allResults = [];
+      let page = 1;
+
+      while (true) {
+        const r = await api.get('/services/', { params: { page } });
+        // If backend returns paginated data: { results: [...], next: ... }
+        if (r.data && Array.isArray(r.data.results)) {
+          allResults = [...allResults, ...r.data.results];
+          if (r.data.next) {
+            page++;
+          } else {
+            break; // No more pages
+          }
+        } else if (Array.isArray(r.data)) {
+          // Backend returned plain array (no pagination)
+          return r.data;
+        } else {
+          break;
+        }
+      }
+      return allResults;
+    },
   });
 }
 
@@ -233,7 +255,12 @@ export function useForceLogoutStaff() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id) => api.post(`/staff/${id}/logout/`).then(r => r.data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['staff'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['staff'] });
+      qc.invalidateQueries({ queryKey: ['dashboard'] });
+      qc.invalidateQueries({ queryKey: ['attendance'] });
+      qc.invalidateQueries({ queryKey: ['attendance-today'] });
+    },
   });
 }
 

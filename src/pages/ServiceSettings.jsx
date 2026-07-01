@@ -19,8 +19,9 @@ export default function ServiceSettings() {
       setNewService('');
       toast.success('Service added');
       refetch();
-    } catch {
-      toast.error('Failed to add service');
+    } catch (error) {
+      const errorMsg = error.response?.data?.name?.[0] || error.response?.data?.detail || 'Failed to add service';
+      toast.error(errorMsg);
     }
   };
 

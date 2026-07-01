@@ -147,13 +147,13 @@ function MonthlyTab() {
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
-        <StatCard label="Total Amount" value={data.total_amount} color="text-blue-600" />
         <StatCard label="Total Charge" value={data.total_charge} color="text-amber-500" />
         <StatCard label="Total Profit" value={data.total_profit} color="text-brand-600" />
         <div className="card text-center py-6 hover:-translate-y-1.5 transition-transform duration-300">
-          <div className="text-3xl font-bold text-slate-800">{data.total_entries}</div>
-          <div className="text-sm font-medium text-slate-500 mt-1">Total Entries</div>
+          <div className="text-3xl font-bold text-rose-500">₹{Number(data.total_expenses || 0).toLocaleString('en-IN')}</div>
+          <div className="text-sm font-medium text-slate-500 mt-1">Total Expenses</div>
         </div>
+        <StatCard label="Total Amount" value={data.total_amount} color="text-blue-600" />
       </div>
 
       {/* Daily breakdown */}
@@ -193,13 +193,13 @@ function YearlyTab() {
       <input type="number" className="input w-32 font-medium" value={year} onChange={(e) => setYear(Number(e.target.value))} min={2020} max={2030} />
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
-        <StatCard label="Yearly Amount" value={data.total_amount} color="text-blue-600" />
         <StatCard label="Yearly Charge" value={data.total_charge} color="text-amber-500" />
         <StatCard label="Yearly Profit" value={data.total_profit} color="text-brand-600" />
         <div className="card text-center py-6 hover:-translate-y-1.5 transition-transform duration-300">
-          <div className="text-3xl font-bold text-slate-800">{data.total_entries}</div>
-          <div className="text-sm font-medium text-slate-500 mt-1">Total Entries</div>
+          <div className="text-3xl font-bold text-rose-500">₹{Number(data.total_expenses || 0).toLocaleString('en-IN')}</div>
+          <div className="text-sm font-medium text-slate-500 mt-1">Total Expenses</div>
         </div>
+        <StatCard label="Yearly Amount" value={data.total_amount} color="text-blue-600" />
       </div>
 
       {data.monthly_breakdown?.length > 0 && (

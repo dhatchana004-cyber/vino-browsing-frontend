@@ -78,10 +78,6 @@ export default function ServiceEntry() {
       toast.error('Please select a service type');
       return;
     }
-    if (!form.customer_name) {
-      toast.error('Please enter customer name');
-      return;
-    }
 
     try {
       const formData = new FormData();
@@ -149,7 +145,7 @@ export default function ServiceEntry() {
         {/* Customer Info Row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div>
-            <label className="input-label">Customer Name</label>
+            <label className="input-label">Customer Name (Optional)</label>
             <input
               type="text"
               className="input"
